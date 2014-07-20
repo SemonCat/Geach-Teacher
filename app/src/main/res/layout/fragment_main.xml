@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/card_background">
+
+
+    <com.semoncat.geach.teacher.ui.SecretTextView
+        android:id="@+id/WelcomeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textSize="30dp"/>
+
+    <GridView
+        android:id="@+id/CourseGrid"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:columnWidth="250dp"
+        android:numColumns="auto_fit"
+        android:verticalSpacing="10dp"
+        android:horizontalSpacing="10dp"
+        android:stretchMode="columnWidth"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        android:layout_margin="30dp"/>
+
+
+</RelativeLayout>

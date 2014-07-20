@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="card_background">#EEEEEE</color>
+
+    <color name="action_bar_color">#4285F4</color>
+    <color name="statusbar_bg">@color/action_bar_color</color>
+    <color name="course_name_background">#30aaaaaa</color>
+
+</resources>
