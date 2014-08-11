@@ -21,7 +21,11 @@ public class ConstantUtil {
 
     public static final String GEACH_FILE_PPT_PATTERN = "Data/Unit%1$02d/PPT/";
 
+    public static final String GEACH_FILE_VIDEO_PATTERN = "Data/Unit%1$02d/VIDEO/";
+
     //請用大寫
     public static final String[] GEACH_FILE_PPT_EXT_FILTER = new String[]{"PNG","JPG"};
+
+    public static final String[] GEACH_FILE_VIDEO_EXT_FILTER = new String[]{"MP4","WMA"};
 
 }

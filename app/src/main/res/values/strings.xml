@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <item type="id" name="blur_backup_image"/>
+
     <string name="app_name">Geach Teacher</string>
+
+    <string name="login_timeout_title">登入過期</string>
+    <string name="login_timeout_message">請重新登入！</string>
+
+    <string name="name_title">%1$s %2$s</string>
 
     <!-- Login Fragment -->
     <string name="email_field">EMail</string>
@@ -17,10 +24,34 @@
 
     <!-- Course Fragment -->
     <string name="start_course_button">開始課程</string>
+    <string name="PPTFileNotReady">課程簡報尚未放置</string>
+    <string name="loading_tip">讀取中，請耐心等候！</string>
+
+    <!-- PPT Fragment -->
+    <string name="PPT_String">簡報</string>
+    <string name="Video_String">影片</string>
+    <string name="PPT_Prev_Des">簡報上一頁</string>
+    <string name="PPT_Next_Des">簡報下一頁</string>
+    <string name="Close_Menu_String">關閉</string>
+
+    <string name="VideoList_Empty">未放置影片</string>
+
+    <!-- Student Fragment -->
+    <string name="student_list_title">學生名單</string>
 
     <!-- CourseAdapter -->
     <string name="course_student_number">修課人數：%1$2d</string>
     <string name="unit_id_format">%1$02d.</string>
     <string name="fileNotFoundException">課程資源尚未放置</string>
     <string name="xmlException">設定檔錯誤</string>
+
+    <!-- Navi Menu -->
+    <string name="navi_home">課程</string>
+    <string name="navi_school">單元</string>
+    <string name="navi_student">學生</string>
+
+    <string name="navi_palette">塗鴉墻</string>
+    <string name="navi_random">大樂透</string>
+
+
 </resources>

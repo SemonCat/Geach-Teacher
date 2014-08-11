@@ -1,4 +1,4 @@
-package com.semoncat.geach.teacher.util.EndlessViewPager;
+package com.semoncat.geach.teacher.ui.EndlessViewPager;
 
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
@@ -43,9 +43,12 @@ public class EndlessViewPager extends ViewPager {
         return mEndlessPagerAdapter != null ? mEndlessPagerAdapter.getPagerAdapter() : null;
     }
 
-    int getPageCount() {
+    public int getPageCount() {
         final PagerAdapter pagerAdapter = getRealAdapter();
         return pagerAdapter != null ? pagerAdapter.getCount() : 0;
     }
 
+    public int getRealCurrentItem() {
+        return getCurrentItem() % getPageCount();
+    }
 }

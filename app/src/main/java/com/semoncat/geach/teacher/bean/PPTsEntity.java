@@ -17,7 +17,7 @@ import java.util.List;
  * Created by SemonCat on 2014/7/17.
  */
 @Root(name = "PPT")
-public class PPTsEntity{
+public class PPTsEntity implements Parcelable {
 
     @ElementList(name = "ImageList",required = false)
     private List<PPTImage> pptImages = new ArrayList<PPTImage>();
@@ -34,4 +34,31 @@ public class PPTsEntity{
         this.pptImages = pptImages;
     }
 
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeTypedList(pptImages);
+    }
+
+    public PPTsEntity() {
+    }
+
+    private PPTsEntity(Parcel in) {
+        in.readTypedList(pptImages, PPTImage.CREATOR);
+    }
+
+    public static final Parcelable.Creator<PPTsEntity> CREATOR = new Parcelable.Creator<PPTsEntity>() {
+        public PPTsEntity createFromParcel(Parcel source) {
+            return new PPTsEntity(source);
+        }
+
+        public PPTsEntity[] newArray(int size) {
+            return new PPTsEntity[size];
+        }
+    };
 }

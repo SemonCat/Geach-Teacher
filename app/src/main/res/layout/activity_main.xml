@@ -1,7 +1,24 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/container"
+<com.semoncat.geach.teacher.ui.HackyNaviDrawer
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/navi_drawer"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"/>
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:background="@color/card_background"
+    app:drawer_gravity="start"
+    app:list_mainSectionsEntries="@array/navigation_main_sections"
+    app:list_mainSectionsDrawables="@array/drawable_ids"
+    app:list_secondarySectionsEntries="@array/navigation_secondary_sections"
+    app:list_secondarySectionsDrawables="@array/secondary_drawable_ids">
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</com.semoncat.geach.teacher.ui.HackyNaviDrawer>
+
 
 
 

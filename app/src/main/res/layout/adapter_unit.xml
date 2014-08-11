@@ -41,26 +41,40 @@
                         android:textColor="@android:color/white"
                         android:layout_marginRight="5dp" />
 
-                    <me.grantland.widget.AutofitTextView
+                    <TextView
                         android:id="@+id/UnitName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="30sp"
+                        android:textSize="30dp"
                         android:gravity="center"
                         android:singleLine="true"
-                        app:minTextSize="8sp"
                         android:textColor="@android:color/white" />
                 </LinearLayout>
             </FrameLayout>
 
-            <ImageView
-                android:id="@+id/UnitCover"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
-                android:maxHeight="100dp"
-                android:maxWidth="100dp"
-                android:layout_margin="10dp"/>
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/PPTFileNotReady"
+                    android:textColor="@color/dangerColor"
+                    android:textSize="25dp"/>
+
+                <ImageView
+                    android:id="@+id/UnitCover"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:maxHeight="100dp"
+                    android:maxWidth="100dp"
+                    android:layout_margin="10dp"/>
+
+            </FrameLayout>
+
         </LinearLayout>
     </android.support.v7.widget.CardView>
 

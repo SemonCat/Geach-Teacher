@@ -1,8 +1,13 @@
 package com.semoncat.geach.teacher.rest;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.semoncat.geach.teacher.bean.CoursesEntity;
+import com.semoncat.geach.teacher.bean.GraffitiObjectEntity;
+import com.semoncat.geach.teacher.bean.GraffitiWallEntity;
+import com.semoncat.geach.teacher.bean.StudentsEntity;
 import com.semoncat.geach.teacher.bean.UsersTeacherEntity;
 import com.semoncat.geach.teacher.util.ConstantUtil;
 import com.squareup.okhttp.Call;
@@ -15,6 +20,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import retrofit.Callback;
+import retrofit.ErrorHandler;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.OkClient;
@@ -29,6 +35,24 @@ import retrofit.http.Path;
  * Created by SemonCat on 2014/7/15.
  */
 public class GeachRestService {
+    public interface UnauthorizedListener {
+        void UnauthorizedEvent(RetrofitError cause);
+    }
+
+    static class UnAuthorizedErrorHandler implements ErrorHandler {
+        @Override
+        public Throwable handleError(RetrofitError cause) {
+            Response r = cause.getResponse();
+            if (r != null && r.getStatus() == 401) {
+                if (unauthorizedListener != null) {
+                    unauthorizedListener.UnauthorizedEvent(cause);
+                }
+            }
+            return cause;
+        }
+    }
+
+
     private static final String TAG = GeachRestService.class.getName();
 
     private static GeachRestService geachRestService;
@@ -37,49 +61,56 @@ public class GeachRestService {
 
     private static Executor executor;
 
-    interface Geach {
-        @FormUrlEncoded
-        @POST("/rest/security/login")
-        void login(
-                @Field("username") String email,
-                @Field("password") String password,
-                Callback<String> cb
-        );
+    private static UnauthorizedListener unauthorizedListener;
 
-        @FormUrlEncoded
-        @POST("/rest/security/login")
-        String loginSync(
-                @Field("username") String email,
-                @Field("password") String password
-        );
+    private final Handler handler = new Handler(Looper.getMainLooper());
+
+    private static ApiRequestInterceptor requestInterceptor;
+
+    interface Geach {
 
         @GET("/rest/teacher/detail")
         void getDetail(Callback<UsersTeacherEntity> callback);
-
-        @GET("/rest/teacher/detail")
-        UsersTeacherEntity getDetailSync();
 
         @GET("/rest/teacher/courses")
         void getCourses(Callback<List<CoursesEntity>> cb);
 
         @GET("/rest/teacher/courses")
         List<CoursesEntity> getCoursesSync();
+
+        @GET("/rest/teacher/courses/{id}/students")
+        void getStudentList(
+                @Path("id")
+                int courseId,
+                Callback<List<StudentsEntity>> callback);
+
+        @GET("/rest/teacher/graffiti/wall")
+        void getGraffitiWallList(Callback<List<GraffitiWallEntity>> callback);
+
+        @GET("/rest/teacher/graffiti/wall/{id}/object")
+        void getGraffitiObjectList(@Path("id")
+                                   int id,
+                                   Callback<List<GraffitiObjectEntity>> callback);
     }
 
-    public static GeachRestService getInstance(){
+    public static GeachRestService getInstance() {
 
-        if (geachRestService==null){
+        if (geachRestService == null) {
             geachRestService = new GeachRestService();
         }
 
         return geachRestService;
     }
 
-    private static void init(){
+    private static void init() {
+        requestInterceptor = new ApiRequestInterceptor();
+
         CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .setEndpoint(ConstantUtil.GEACH_SERVER)
+                .setRequestInterceptor(requestInterceptor)
+                .setErrorHandler(new UnAuthorizedErrorHandler())
                 .build();
 
         // Create an instance of our GitHub API interface.
@@ -92,33 +123,41 @@ public class GeachRestService {
         init();
     }
 
-    public void Login(String email,String password,Callback<String> callback){
-        geachService.login(email,password,callback);
+    public void setUnauthorizedListener(UnauthorizedListener unauthorizedListener) {
+        GeachRestService.unauthorizedListener = unauthorizedListener;
     }
 
-    public String LoginSync(String email,String password){
-        return geachService.loginSync(email, password);
+    public void Login(String email, String password) {
+        requestInterceptor.setAccount(email);
+        requestInterceptor.setPassword(password);
     }
 
-    public void LoginAndGetDetail(final String email,final String password,final Callback<UsersTeacherEntity> callback){
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                LoginSync(email, password);
-                getDetail(callback);
-            }
-        });
-    }
-
-    public void getDetail(Callback<UsersTeacherEntity> callback){
+    public void getDetail(Callback<UsersTeacherEntity> callback) {
         geachService.getDetail(callback);
     }
 
-    public List<CoursesEntity> getCoursesSync(){
+    public List<CoursesEntity> getCoursesSync() {
         return geachService.getCoursesSync();
     }
 
-    public void getCourses(Callback<List<CoursesEntity>> callback){
+    public void getCourses(Callback<List<CoursesEntity>> callback) {
         geachService.getCourses(callback);
+    }
+
+    public void getStudentList(int courseId, Callback<List<StudentsEntity>> callback) {
+        geachService.getStudentList(courseId, callback);
+    }
+
+    public void getGraffitiWallList(Callback<List<GraffitiWallEntity>> callback) {
+        geachService.getGraffitiWallList(callback);
+    }
+
+    public void getGraffitiObjectList(int id,
+                                      Callback<List<GraffitiObjectEntity>> callback) {
+        geachService.getGraffitiObjectList(id, callback);
+    }
+
+    private void runOnUiThread(Runnable runnable) {
+        handler.post(runnable);
     }
 }

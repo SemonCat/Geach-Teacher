@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="navigation_main_sections">
+        <item>@string/navi_home</item>
+        <item>@string/navi_school</item>
+        <item>@string/navi_student</item>
+    </string-array>
+
+    <string-array name="navigation_secondary_sections">
+        <item>@string/navi_palette</item>
+        <item>@string/navi_random</item>
+    </string-array>
+
+    <array name="drawable_ids">
+        <item>@drawable/ic_home</item>
+        <item>@drawable/ic_school</item>
+        <item>@drawable/ic_people</item>
+    </array>
+
+    <array name="secondary_drawable_ids">
+        <item>@drawable/ic_palette</item>
+        <item>@drawable/ic_random</item>
+    </array>
+</resources>

@@ -7,6 +7,7 @@ import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -16,6 +17,8 @@ import com.semoncat.geach.teacher.R;
 import com.semoncat.geach.teacher.bean.PPTImage;
 import com.semoncat.geach.teacher.bean.PPTsEntity;
 import com.semoncat.geach.teacher.bean.UnitEntity;
+import com.semoncat.geach.teacher.bean.Video;
+import com.semoncat.geach.teacher.bean.VideosEntity;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -29,6 +32,8 @@ import java.util.Vector;
 public class UnitPagerAdapter extends PagerAdapter {
 
     public interface OnPagerItemClickListener {
+        boolean OnPagerItemTouch(UnitPagerAdapter adapter, View view, int position);
+
         void OnPagerItemClick(UnitPagerAdapter adapter, View view, int position);
     }
 
@@ -46,7 +51,7 @@ public class UnitPagerAdapter extends PagerAdapter {
         this.unitEntities = unitEntities;
     }
 
-    public void refresh(List<UnitEntity> unitEntities){
+    public void refresh(List<UnitEntity> unitEntities) {
         this.unitEntities = unitEntities;
         notifyDataSetChanged();
     }
@@ -67,6 +72,15 @@ public class UnitPagerAdapter extends PagerAdapter {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.adapter_unit,
                 container, false);
 
+        convertView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (listener != null) {
+                    return listener.OnPagerItemTouch(UnitPagerAdapter.this, v, position);
+                }
+                return false;
+            }
+        });
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,9 +104,12 @@ public class UnitPagerAdapter extends PagerAdapter {
         PPTsEntity ppTsEntity = unitEntity.getPPTsEntity();
 
 
-        if (ppTsEntity.getPptImages().size()>0){
+        if (ppTsEntity.getPptImages().size() > 0) {
             File pptCover = new File(ppTsEntity.getPptImages().get(0).getPPTPathTmp());
             Picasso.with(container.getContext()).load(pptCover).into(UnitCover);
+            UnitCover.setVisibility(View.VISIBLE);
+        } else {
+            UnitCover.setVisibility(View.GONE);
         }
 
         container.addView(convertView);

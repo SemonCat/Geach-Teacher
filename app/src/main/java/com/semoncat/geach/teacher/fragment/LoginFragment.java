@@ -1,6 +1,11 @@
 package com.semoncat.geach.teacher.fragment;
 
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -9,16 +14,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.dd.CircularProgressButton;
 import com.nvanbenschoten.motion.ParallaxImageView;
+import com.semoncat.geach.teacher.MainActivity;
 import com.semoncat.geach.teacher.R;
 import com.semoncat.geach.teacher.bean.CoursesEntity;
 import com.semoncat.geach.teacher.bean.UsersTeacherEntity;
 import com.semoncat.geach.teacher.rest.GeachRestService;
 import com.semoncat.geach.teacher.util.SecurePreferences;
+import com.squareup.picasso.Picasso;
 
 
 import java.util.List;
@@ -36,6 +45,7 @@ public class LoginFragment extends BaseFragment implements Callback<UsersTeacher
 
     private static final String EMAIL = "email";
     private static final String PASSWORD = "password";
+
 
     private CircularProgressButton LoginButton;
     private ParallaxImageView LogoImage;
@@ -61,20 +71,19 @@ public class LoginFragment extends BaseFragment implements Callback<UsersTeacher
         if (savedInstanceState != null) {
             EmailField.setText(savedInstanceState.getString(EMAIL, EMPTY));
             PasswordField.setText(savedInstanceState.getString(PASSWORD, EMPTY));
-        }else{
-            String email = getSharedPreferences().getString(EMAIL,EMPTY);
-            if (!TextUtils.isEmpty(email)){
+        } else {
+            String email = getSharedPreferences().getString(EMAIL, EMPTY);
+            if (!TextUtils.isEmpty(email)) {
                 EmailField.setText(email);
                 PasswordField.requestFocus();
             }
 
-            String password = securePreferences.getString(PASSWORD,EMPTY);
-            if (!TextUtils.isEmpty(password)){
+            String password = securePreferences.getString(PASSWORD, EMPTY);
+            if (!TextUtils.isEmpty(password)) {
                 PasswordField.setText(password);
             }
 
         }
-
 
 
         handler = new Handler();
@@ -110,8 +119,16 @@ public class LoginFragment extends BaseFragment implements Callback<UsersTeacher
     @Override
     public void onPause() {
         super.onPause();
-        if (LogoImage!=null){
+        if (LogoImage != null) {
             LogoImage.unregisterSensorManager();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (LogoImage != null) {
+            LogoImage.registerSensorManager();
         }
     }
 
@@ -137,9 +154,12 @@ public class LoginFragment extends BaseFragment implements Callback<UsersTeacher
                 hideKeyboard();
                 if (LoginButton.getProgress() == 0) {
                     LoginButton.setProgress(50);
-                    geachRestService.LoginAndGetDetail(EmailField.getText().toString(),
-                            PasswordField.getText().toString(),
-                            LoginFragment.this);
+
+                    geachRestService.Login(EmailField.getText().toString(),
+                            PasswordField.getText().toString());
+
+                    geachRestService.getDetail(LoginFragment.this);
+
                 } else if (LoginButton.getProgress() == -1) {
                     LoginButton.setProgress(0);
                 }
@@ -157,6 +177,10 @@ public class LoginFragment extends BaseFragment implements Callback<UsersTeacher
                 toMainFragment(usersTeacherEntity);
             }
         }, SUCCESS_STATE_TIMEOUT);
+
+        setHeadInfo(usersTeacherEntity);
+
+        setupGeachRestService();
     }
 
     @Override
@@ -174,14 +198,14 @@ public class LoginFragment extends BaseFragment implements Callback<UsersTeacher
             public void run() {
                 LoginButton.setProgress(0);
             }
-        },FAILURE_STATE_TIMEOUT);
+        }, FAILURE_STATE_TIMEOUT);
     }
 
-    private void rememberMe(){
-        getSharedPreferences().edit().putString(EMAIL,EmailField.getText().toString()).commit();
+    private void rememberMe() {
+        getSharedPreferences().edit().putString(EMAIL, EmailField.getText().toString()).commit();
 
         //getSharedPreferences().edit().putString(PASSWORD,PasswordField.getText().toString()).commit();
-        securePreferences.edit().putString(PASSWORD,PasswordField.getText().toString()).commit();
+        securePreferences.edit().putString(PASSWORD, PasswordField.getText().toString()).commit();
     }
 
     @Override
@@ -189,12 +213,12 @@ public class LoginFragment extends BaseFragment implements Callback<UsersTeacher
         return R.layout.fragment_login;
     }
 
-    private void toMainFragment(UsersTeacherEntity usersTeacherEntity){
+    private void toMainFragment(UsersTeacherEntity usersTeacherEntity) {
         hideKeyboard();
 
         MainFragment mainFragment = new MainFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable(UsersTeacherEntity.class.getName(),usersTeacherEntity);
+        bundle.putParcelable(UsersTeacherEntity.class.getName(), usersTeacherEntity);
         mainFragment.setArguments(bundle);
 
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
@@ -203,7 +227,52 @@ public class LoginFragment extends BaseFragment implements Callback<UsersTeacher
                 R.anim.slide_fragment_horizontal_left_out,
                 R.anim.slide_fragment_horizontal_left_in,
                 R.anim.slide_fragment_horizontal_left_out);
-        fragmentTransaction.replace(R.id.container,mainFragment);
+        fragmentTransaction.replace(R.id.container, mainFragment);
         fragmentTransaction.commit();
     }
+
+    private void setHeadInfo(UsersTeacherEntity usersTeacherEntity) {
+        View rootView = getDrawer().getMenuHeader();
+
+        ImageView Head = (ImageView) rootView.findViewById(R.id.Head);
+        TextView Name = (TextView) rootView.findViewById(R.id.Name);
+        TextView EMail = (TextView) rootView.findViewById(R.id.Email);
+
+        Picasso.with(getActivity()).load(usersTeacherEntity.getPhoto()).into(Head);
+
+        Name.setText(usersTeacherEntity.getName());
+        EMail.setText(usersTeacherEntity.getSchool());
+    }
+
+
+    private void setupGeachRestService() {
+        final Handler handler = new Handler();
+        GeachRestService.getInstance().setUnauthorizedListener(new GeachRestService.UnauthorizedListener() {
+            @Override
+            public void UnauthorizedEvent(RetrofitError cause) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        showUnauthorizedDialog();
+                    }
+                });
+            }
+        });
+    }
+
+    private void showUnauthorizedDialog() {
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.login_timeout_title)
+                .setMessage(R.string.login_timeout_message)
+                .setCancelable(false)
+                .setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                        startActivity(new Intent(getActivity(), MainActivity.class));
+                    }
+                }).show();
+    }
+
+
 }

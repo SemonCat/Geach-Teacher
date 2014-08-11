@@ -3,6 +3,7 @@ package com.semoncat.geach.teacher.util;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -12,11 +13,14 @@ import com.semoncat.geach.teacher.bean.CoursesEntity;
 import com.semoncat.geach.teacher.bean.PPTsEntity;
 import com.semoncat.geach.teacher.bean.PPTImage;
 import com.semoncat.geach.teacher.bean.UnitEntity;
+import com.semoncat.geach.teacher.bean.Video;
+import com.semoncat.geach.teacher.bean.VideosEntity;
 
 import org.apache.commons.io.FilenameUtils;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.ConvertException;
 import org.simpleframework.xml.core.Persister;
+import org.zeroturnaround.zip.NameMapper;
 import org.zeroturnaround.zip.ZipEntryCallback;
 import org.zeroturnaround.zip.ZipInfoCallback;
 import org.zeroturnaround.zip.ZipUtil;
@@ -70,7 +74,9 @@ public class CourseXMLParser implements CourseFileParser {
     }
 
     private File getGeachConfigCacheDir() {
-        File file = new File(context.getCacheDir() + GEACH_CONFIG_TEMP_PATH);
+        //File file = new File(context.getCacheDir() + GEACH_CONFIG_TEMP_PATH);
+
+        File file = new File(context.getExternalCacheDir() + GEACH_CONFIG_TEMP_PATH);
 
         if (!file.isDirectory()) {
             file.mkdirs();
@@ -150,6 +156,9 @@ public class CourseXMLParser implements CourseFileParser {
 
             unitEntity.setPPTsEntity(ppTsEntity);
 
+            VideosEntity videosEntity = getVideoFile(courseFileObject, unitEntity.getId());
+
+            unitEntity.setVideosEntity(videosEntity);
         }
 
 
@@ -165,15 +174,18 @@ public class CourseXMLParser implements CourseFileParser {
         File checkSum = new File(targetFile + GEACH_CONFIG_CHECKSUM_PATH);
 
         if (checkSum.exists()) {
-
+            checkUpdate(coursesEntity, cFile, checkSum);
+            return targetFile;
+            /*
             String md5 = getStringFromFile(checkSum);
-
             if (MD5.checkMD5(md5, cFile)) {
                 return targetFile;
             }
+            */
 
         }
 
+        targetFile.delete();
         ZipUtil.unpack(cFile, targetFile);
         writeToFile(MD5.calculateMD5(cFile), checkSum);
 
@@ -181,9 +193,28 @@ public class CourseXMLParser implements CourseFileParser {
         return targetFile;
     }
 
+
+    private void checkUpdate(final CoursesEntity coursesEntity, final File cFile, final File checkSum) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String md5 = getStringFromFile(checkSum);
+                    if (!MD5.checkMD5(md5, cFile)) {
+                        checkSum.delete();
+                        unpackCourseFile(coursesEntity);
+                    }
+                } catch (IOException e) {
+
+                }
+
+            }
+        });
+    }
+
     public PPTsEntity getPPTFile(File courseUnpackPath, int unit) throws FileNotFoundException {
 
-        final PPTsEntity PPTsEntity = new PPTsEntity();
+        PPTsEntity PPTsEntity = new PPTsEntity();
 
         String pptFilePath = String.format(ConstantUtil.GEACH_FILE_PPT_PATTERN, unit);
 
@@ -203,6 +234,29 @@ public class CourseXMLParser implements CourseFileParser {
         }
 
         return PPTsEntity;
+    }
+
+    public VideosEntity getVideoFile(File courseUnpackPath, int unit) throws FileNotFoundException {
+        VideosEntity videosEntity = new VideosEntity();
+
+        String videoFilePath = String.format(ConstantUtil.GEACH_FILE_VIDEO_PATTERN, unit);
+
+        File videoFileDir = new File(courseUnpackPath + File.separator + videoFilePath);
+
+        if (videoFileDir.isDirectory()) {
+            for (File videoFile : videoFileDir.listFiles()) {
+                String fileName = videoFile.getName();
+
+                if (!videoFile.isDirectory() && FilenameUtils.isExtension(fileName.toUpperCase(), ConstantUtil.GEACH_FILE_VIDEO_EXT_FILTER)) {
+                    Video video = new Video();
+                    video.setName(FilenameUtils.getBaseName(fileName));
+                    video.setVideoPath(videoFile.getPath());
+                    videosEntity.addVideo(video);
+                }
+            }
+        }
+
+        return videosEntity;
     }
 
     public File[] getGeachZipFile() throws FileNotFoundException {
@@ -230,7 +284,7 @@ public class CourseXMLParser implements CourseFileParser {
         for (File file : geachZipFile) {
             //如果 GeachFile 的檔名跟 Course 一樣，則視為該課程之檔案
 
-            String fileName = String.format(ConstantUtil.GEACH_FILE_NAME_PATTENR,courseId);
+            String fileName = String.format(ConstantUtil.GEACH_FILE_NAME_PATTENR, courseId);
 
             if (file.getName().startsWith(fileName)) {
                 return file;

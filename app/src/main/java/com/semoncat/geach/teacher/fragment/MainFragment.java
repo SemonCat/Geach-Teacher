@@ -60,6 +60,8 @@ public class MainFragment extends BaseFragment implements Callback<List<CoursesE
 
     private static final String TAG = MainFragment.class.getName();
 
+    public static int HOME_FRAGMENT_ID;
+
     private static final int WELCOME_ANIM_TIME = 1500;
     private static final int WELCOME_ANIM_TIMEOUT = 1000;
 
@@ -92,6 +94,7 @@ public class MainFragment extends BaseFragment implements Callback<List<CoursesE
             }
         }
 
+        hideNaviDrawer();
     }
 
     @Override
@@ -244,13 +247,14 @@ public class MainFragment extends BaseFragment implements Callback<List<CoursesE
         bundle.putParcelable(CoursesEntity.class.getName(), coursesEntity);
         courseFragment.setArguments(bundle);
 
-        getFragmentManager().beginTransaction()
-                .addToBackStack(MainFragment.class.getName())
-                .setCustomAnimations(R.anim.scalexy_enter,
-                        R.anim.scalexy_exit,
-                        R.anim.scalexy_enter,
-                        R.anim.scalexy_exit)
-                .replace(R.id.container, courseFragment)
-                .commit();
+        HOME_FRAGMENT_ID =
+                getFragmentManager().beginTransaction()
+                        .addToBackStack(MainFragment.class.getName())
+                        .setCustomAnimations(R.anim.scalexy_enter,
+                                R.anim.scalexy_exit,
+                                R.anim.scalexy_enter,
+                                R.anim.scalexy_exit)
+                        .replace(R.id.container, courseFragment)
+                        .commit();
     }
 }

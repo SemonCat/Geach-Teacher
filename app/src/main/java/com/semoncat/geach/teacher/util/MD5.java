@@ -34,6 +34,7 @@ public class MD5 {
     }
 
     public static String calculateMD5(File updateFile) {
+
         MessageDigest digest;
         try {
             digest = MessageDigest.getInstance("MD5");
@@ -71,5 +72,14 @@ public class MD5 {
                 Log.e(TAG, "Exception on closing MD5 input stream", e);
             }
         }
+
+        /*
+        try {
+            return com.twmacinta.util.MD5.asHex(com.twmacinta.util.MD5.getHash(updateFile));
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to process file for MD5", e);
+        }
+        */
     }
+
 }

@@ -34,6 +34,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     }
 
 
+    /*
     public void testZip(){
 
 
@@ -54,9 +55,9 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
 
     }
+    */
 
 
-    /*
     public void testGenerateXML(){
 
         try {
@@ -93,31 +94,9 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
             e.printStackTrace();
         }
     }
-*/
 
 
 
 
-    /*
-    public void testGetCourse() throws Exception {
-        GeachRestService.getInstance().LoginSync("gn00742754@gmail.com", "aajc1234");
-        List<CoursesEntity> coursesEntities = GeachRestService.getInstance().getCoursesSync();
-
-        CourseFileParser courseFileParser = new CourseXMLParser(getContext(),new File(ConstantUtil.GEACH_ABS_DIR));
-
-        for (CoursesEntity coursesEntity : coursesEntities){
-            System.out.println(coursesEntity.toString());
-            try{
-                CourseFile courseFile = courseFileParser.getCourseFileSync(coursesEntity);
-                Log.d(TAG,"CourseFile:"+courseFile.getId());
-            }catch (FileNotFoundException e){
-
-            }
-
-
-        }
-
-    }
-    */
 
 }

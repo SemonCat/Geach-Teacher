@@ -14,6 +14,7 @@ public class UsersTeacherEntity implements Parcelable {
 
     private int id;
     private String name;
+    private String photo;
     private String title;
     private String school;
     private String memo;
@@ -32,6 +33,14 @@ public class UsersTeacherEntity implements Parcelable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
     }
 
     public String getTitle() {
@@ -95,6 +104,7 @@ public class UsersTeacherEntity implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.id);
         dest.writeString(this.name);
+        dest.writeString(this.photo);
         dest.writeString(this.title);
         dest.writeString(this.school);
         dest.writeString(this.memo);
@@ -106,12 +116,13 @@ public class UsersTeacherEntity implements Parcelable {
     private UsersTeacherEntity(Parcel in) {
         this.id = in.readInt();
         this.name = in.readString();
+        this.photo = in.readString();
         this.title = in.readString();
         this.school = in.readString();
         this.memo = in.readString();
     }
 
-    public static final Parcelable.Creator<UsersTeacherEntity> CREATOR = new Parcelable.Creator<UsersTeacherEntity>() {
+    public static final Creator<UsersTeacherEntity> CREATOR = new Creator<UsersTeacherEntity>() {
         public UsersTeacherEntity createFromParcel(Parcel source) {
             return new UsersTeacherEntity(source);
         }

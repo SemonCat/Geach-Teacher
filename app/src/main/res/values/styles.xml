@@ -3,12 +3,19 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="android:Theme.Holo.Light">
         <item name="android:actionBarStyle">@style/UActionBar</item>
-        <item name="android:fitsSystemWindows">true</item>
     </style>
 
     <style name="UActionBar" parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
         <item name="android:background">@color/action_bar_color</item>
         <item name="android:icon">@android:color/transparent</item>
+    </style>
+
+    <style name="HeadStyle">
+        <item name="android:scaleType">centerCrop</item>
+        <item name="corner_radius">360dip</item>
+        <item name="border_width">2dip</item>
+        <item name="border_color">@color/head_border_color</item>
+        <item name="round_background">true</item>
     </style>
 
 </resources>

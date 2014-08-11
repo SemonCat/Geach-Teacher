@@ -16,11 +16,11 @@ import java.util.List;
  * Created by SemonCat on 2014/7/18.
  */
 @Root(name = "Course")
-public class CourseFile{
+public class CourseFile implements Parcelable {
 
     private int id;
 
-    @ElementList(name = "Unit")
+    @ElementList(name = "UnitList")
     private List<UnitEntity> unitEntities;
 
     public void addUnitEntity(UnitEntity unitEntity) {
@@ -48,4 +48,33 @@ public class CourseFile{
         this.id = id;
     }
 
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.id);
+        dest.writeTypedList(unitEntities);
+    }
+
+    public CourseFile() {
+    }
+
+    private CourseFile(Parcel in) {
+        this.id = in.readInt();
+        in.readTypedList(unitEntities, UnitEntity.CREATOR);
+    }
+
+    public static final Parcelable.Creator<CourseFile> CREATOR = new Parcelable.Creator<CourseFile>() {
+        public CourseFile createFromParcel(Parcel source) {
+            return new CourseFile(source);
+        }
+
+        public CourseFile[] newArray(int size) {
+            return new CourseFile[size];
+        }
+    };
 }

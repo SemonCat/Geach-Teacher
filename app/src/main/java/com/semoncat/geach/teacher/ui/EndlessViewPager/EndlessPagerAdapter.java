@@ -1,4 +1,4 @@
-package com.semoncat.geach.teacher.util.EndlessViewPager;
+package com.semoncat.geach.teacher.ui.EndlessViewPager;
 
 import android.os.Parcelable;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -43,6 +43,9 @@ class EndlessPagerAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
+        if (mPagerAdapter.getCount() < 2){
+            return 1;
+        }
         return Integer.MAX_VALUE; // this is the magic that we can scroll infinitely.
     }
 
